@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriGenius: AI-Powered Platform for Farmers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+            overflow-x: hidden;
+        }
+
+        .chat-message {
+            max-width: 80%;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin-bottom: 0.5rem;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background-color: #6366f1;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 0;
+        }
+
+        .ai-message {
+            background-color: #e5e7eb;
+            color: #1f2937;
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-green-700">AgriGenius</h1>
+            <nav class="hidden md:flex space-x-6 text-gray-600 font-medium">
+                <a href="#features" class="hover:text-green-700 transition-colors">Features</a>
+                <a href="#about" class="hover:text-green-700 transition-colors">About</a>
+                <a href="#contact" class="hover:text-green-700 transition-colors">Contact</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <div class="relative inline-block text-left">
+                    <button id="language-btn" class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        Language
+                        <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div id="language-menu" class="origin-top-right absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden z-10">
+                        <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="language-btn">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang="en">English</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang="hi">Hindi</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang="te">Telugu</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang="mr">Marathi</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang="kn">Kannada</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang="gu">Gujarati</a>
+                        </div>
+                    </div>
+                </div>
+                <button id="mobile-menu-btn" class="md:hidden text-gray-600 hover:text-green-700 focus:outline-none">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white shadow-md">
+            <a href="#features" class="block py-2 px-4 text-gray-600 hover:bg-gray-100">Features</a>
+            <a href="#about" class="block py-2 px-4 text-gray-600 hover:bg-gray-100">About</a>
+            <a href="#contact" class="block py-2 px-4 text-gray-600 hover:bg-gray-100">Contact</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero" class="relative bg-gradient-to-r from-green-600 to-green-800 text-white py-20 md:py-32 overflow-hidden">
+        <div id="canvas-container" class="absolute inset-0 z-0 opacity-20"></div>
+        <div class="container mx-auto px-4 relative z-10 text-center">
+            <h2 class="text-4xl md:text-6xl font-extrabold leading-tight tracking-wide mb-4">
+                Empowering Farmers with AI
+            </h2>
+            <p class="text-lg md:text-xl max-w-2xl mx-auto mb-8">
+                AgriGenius provides AI-powered insights on crop selection, market prices, risk alerts, and government schemes to ensure a sustainable and profitable future for agriculture.
+            </p>
+            <a href="#ai-section" class="bg-white text-green-700 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-200 transition-transform transform hover:scale-105">
+                Chat with AgriGenius AI
+            </a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 md:py-24 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">Features</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1: Crop Selection -->
+                <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow transform hover:scale-105">
+                    <div class="flex items-center justify-center w-16 h-16 bg-green-100 text-green-600 rounded-full mb-6">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M12 20a8 8 0 100-16 8 8 0 000 16z"></path>
+                        </svg>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">Smart Crop Selection</h4>
+                    <p class="text-gray-600">Get data-driven recommendations on the best crops to plant based on your soil, climate, and market trends.</p>
+                </div>
+                <!-- Feature 2: Market Prices -->
+                <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow transform hover:scale-105">
+                    <div class="flex items-center justify-center w-16 h-16 bg-green-100 text-green-600 rounded-full mb-6">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6m-5 4h8m-11 4h12M9 17l4 4 4-4"></path>
+                        </svg>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">Real-time Market Prices</h4>
+                    <p class="text-gray-600">Stay informed about current market prices to maximize your profits and make timely sales decisions.</p>
+                </div>
+                <!-- Feature 3: Risk Alerts -->
+                <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow transform hover:scale-105">
+                    <div class="flex items-center justify-center w-16 h-16 bg-green-100 text-green-600 rounded-full mb-6">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">Proactive Risk Alerts</h4>
+                    <p class="text-gray-600">Receive instant notifications for potential risks like pest outbreaks, diseases, and extreme weather conditions.</p>
+                </div>
+                <!-- Feature 4: Government Schemes -->
+                <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow transform hover:scale-105">
+                    <div class="flex items-center justify-center w-16 h-16 bg-green-100 text-green-600 rounded-full mb-6">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">Government Schemes</h4>
+                    <p class="text-gray-600">Access a comprehensive and up-to-date database of government schemes and subsidies for farmers.</p>
+                </div>
+                <!-- Feature 5: Rewards Program -->
+                <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow transform hover:scale-105">
+                    <div class="flex items-center justify-center w-16 h-16 bg-green-100 text-green-600 rounded-full mb-6">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.085 18.068a1 1 0 011.83 0l.564 1.13a1 1 0 00.74.582l1.25.18a1 1 0 01.55 1.705l-.907.96a1 1 0 00-.28.847l.214 1.29a1 1 0 01-1.455 1.054l-1.127-.61a1 1 0 00-.915 0l-1.127.61a1 1 0 01-1.455-1.054l.214-1.29a1 1 0 00-.28-.847l-.907-.96a1 1 0 01.55-1.705l1.25-.18a1 1 0 00.74-.582l.564-1.13z"></path>
+                        </svg>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">Sustainable Rewards</h4>
+                    <p class="text-gray-600">Earn rewards for practicing sustainable and profitable agriculture, promoting a healthier environment.</p>
+                </div>
+                <!-- Feature 6: AI Chatbot -->
+                <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow transform hover:scale-105">
+                    <div class="flex items-center justify-center w-16 h-16 bg-green-100 text-green-600 rounded-full mb-6">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v4a2 2 0 01-2 2h-2m-2 4h4a2 2 0 002-2v-4a2 2 0 00-2-2h-4m-2 4a2 2 0 01-2-2v-4a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2z"></path>
+                        </svg>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">AI-Powered Chatbot</h4>
+                    <p class="text-gray-600">Interact with our AI assistant using text, voice, or images to get instant answers to your farming questions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Chatbot Section -->
+    <section id="ai-section" class="py-16 md:py-24 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">Chat with AgriGenius AI ✨</h3>
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden max-w-4xl mx-auto p-6 flex flex-col h-[700px]">
+                <!-- Chat display area -->
+                <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <!-- AI intro message -->
+                    <div class="flex justify-start">
+                        <div class="ai-message chat-message">
+                            Hello! I am AgriGenius AI. How can I assist you with your farming needs today? You can type your question, or use the microphone and camera icons to ask me with voice or an image.
+                            <button class="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs hover:bg-gray-300" onclick="playAudio(this.parentElement.textContent.replace('🔊', '').trim())">🔊</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input area -->
+                <div class="p-4 border-t border-gray-200 flex items-center space-x-4">
+                    <input type="file" id="image-upload" accept="image/*" class="hidden">
+                    <input type="text" id="chat-input" class="flex-1 rounded-full border border-gray-300 p-3 px-6 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors" placeholder="Type your message here...">
+                    <button id="image-btn" class="text-gray-600 hover:text-green-700 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors" title="Analyze an image of a crop">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 4h.01M6 20h.01"></path>
+                        </svg>
+                    </button>
+                    <button id="voice-btn" class="text-gray-600 hover:text-green-700 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors" title="Send a voice message">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-14 0V9a7 7 0 0114 0v2zm-3 0a4 4 0 01-8 0v2a4 4 0 018 0v-2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 17v4m-4-4h8"></path>
+                        </svg>
+                    </button>
+                    <button id="send-btn" class="bg-green-600 text-white rounded-full p-3 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <!-- Loading indicator -->
+            <div id="loading-indicator" class="mt-4 text-center text-gray-500 hidden">
+                <p>AgriGenius is thinking... ✨</p>
+            </div>
+            <!-- Audio playback element -->
+            <audio id="audio-player" class="hidden" controls></audio>
+        </div>
+    </section>
+
+    <!-- About and Contact Section -->
+    <section id="about" class="py-16 md:py-24 bg-white">
+        <div class="container mx-auto px-4 text-center max-w-4xl">
+            <h3 class="text-3xl md:text-4xl font-bold mb-6">About AgriGenius</h3>
+            <p class="text-lg text-gray-600 mb-8">
+                AgriGenius is a revolutionary platform committed to transforming agriculture through technology. Our mission is to empower farmers worldwide with accurate, accessible, and actionable insights, promoting sustainable and profitable farming practices. By leveraging the power of AI, we aim to bridge the information gap and help every farmer achieve predictable prosperity.
+            </p>
+            <div class="flex justify-center space-x-8">
+                <a href="#contact" class="text-green-600 font-semibold hover:text-green-800 transition-colors">Contact Us</a>
+                <a href="#" class="text-green-600 font-semibold hover:text-green-800 transition-colors">Read Our Mission</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-lg">&copy; 2024 AgriGenius. All rights reserved.</p>
+            <div class="flex justify-center space-x-6 mt-4">
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+
+    <script>
+        const GEMINI_TEXT_API = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=`;
+        const GEMINI_TTS_API = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=`;
+        const apiKey = "";
+
+        async function playAudio(text) {
+            try {
+                const payload = {
+                    contents: [{
+                        parts: [{
+                            text: text
+                        }]
+                    }],
+                    generationConfig: {
+                        responseModalities: ["AUDIO"],
+                        speechConfig: {
+                            voiceConfig: {
+                                prebuiltVoiceConfig: {
+                                    voiceName: "Leda"
+                                }
+                            }
+                        }
+                    }
+                };
+
+                const response = await fetch(GEMINI_TTS_API + apiKey, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const audioData = result?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+
+                if (audioData) {
+                    const audioBlob = base64ToWavBlob(audioData);
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const audioPlayer = document.getElementById('audio-player');
+                    audioPlayer.src = audioUrl;
+                    audioPlayer.play();
+                }
+            } catch (error) {
+                console.error("Error generating or playing audio:", error);
+            }
+        }
+
+        function base64ToWavBlob(base64Data) {
+            const binaryString = atob(base64Data);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+
+            // Create a WAV header for a mono, 16-bit PCM, 24000 Hz file
+            const buffer = new ArrayBuffer(44 + bytes.byteLength);
+            const view = new DataView(buffer);
+            
+            // RIFF identifier 'RIFF'
+            writeString(view, 0, 'RIFF');
+            // file length
+            view.setUint32(4, 36 + bytes.byteLength, true);
+            // RIFF type 'WAVE'
+            writeString(view, 8, 'WAVE');
+            // format chunk identifier 'fmt '
+            writeString(view, 12, 'fmt ');
+            // format chunk length
+            view.setUint32(16, 16, true);
+            // sample format (raw)
+            view.setUint16(20, 1, true);
+            // channel count
+            view.setUint16(22, 1, true);
+            // sample rate
+            view.setUint32(24, 24000, true);
+            // byte rate (24000 * 1 * 2)
+            view.setUint32(28, 48000, true);
+            // block align (1 * 2)
+            view.setUint16(32, 2, true);
+            // bits per sample
+            view.setUint16(34, 16, true);
+            // data chunk identifier 'data'
+            writeString(view, 36, 'data');
+            // data chunk length
+            view.setUint32(40, bytes.byteLength, true);
+
+            // Copy PCM data
+            let offset = 44;
+            for (let i = 0; i < bytes.byteLength; i++) {
+                view.setInt8(offset + i, bytes[i]);
+            }
+
+            return new Blob([view], { type: 'audio/wav' });
+        }
+
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const languageBtn = document.getElementById('language-btn');
+            const languageMenu = document.getElementById('language-menu');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            languageBtn.addEventListener('click', () => {
+                languageMenu.classList.toggle('hidden');
+            });
+
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            const texts = {
+                en: {
+                    title: "AgriGenius: AI-Powered Platform for Farmers",
+                    hero_heading: "Empowering Farmers with AI",
+                    hero_subheading: "AgriGenius provides AI-powered insights on crop selection, market prices, risk alerts, and government schemes to ensure a sustainable and profitable future for agriculture.",
+                    chat_btn: "Chat with AgriGenius AI",
+                    features_heading: "Features",
+                    feature1_title: "Smart Crop Selection",
+                    feature1_desc: "Get data-driven recommendations on the best crops to plant based on your soil, climate, and market trends.",
+                    feature2_title: "Real-time Market Prices",
+                    feature2_desc: "Stay informed about current market prices to maximize your profits and make timely sales decisions.",
+                    feature3_title: "Proactive Risk Alerts",
+                    feature3_desc: "Receive instant notifications for potential risks like pest outbreaks, diseases, and extreme weather conditions.",
+                    feature4_title: "Government Schemes",
+                    feature4_desc: "Access a comprehensive and up-to-date database of government schemes and subsidies for farmers.",
+                    feature5_title: "Sustainable Rewards",
+                    feature5_desc: "Earn rewards for practicing sustainable and profitable agriculture, promoting a healthier environment.",
+                    feature6_title: "AI-Powered Chatbot",
+                    feature6_desc: "Interact with our AI assistant using text, voice, or images to get instant answers to your farming questions.",
+                    chat_heading: "Chat with AgriGenius AI ✨",
+                    chat_initial: "Hello! I am AgriGenius AI. How can I assist you with your farming needs today? You can type your question, or use the microphone and camera icons to ask me with voice or an image.",
+                    chat_input_placeholder: "Type your message here...",
+                    loading_text: "AgriGenius is thinking... ✨",
+                    about_heading: "About AgriGenius",
+                    about_text: "AgriGenius is a revolutionary platform committed to transforming agriculture through technology. Our mission is to empower farmers worldwide with accurate, accessible, and actionable insights, promoting sustainable and profitable farming practices. By leveraging the power of AI, we aim to bridge the information gap and help every farmer achieve predictable prosperity.",
+                    contact_link: "Contact Us",
+                    mission_link: "Read Our Mission",
+                    footer_text: "© 2024 AgriGenius. All rights reserved.",
+                    privacy_link: "Privacy Policy",
+                    terms_link: "Terms of Service"
+                },
+                hi: {
+                    title: "एग्रीजीनियस: किसानों के लिए एआई-पावर्ड प्लेटफॉर्म",
+                    hero_heading: "एआई के साथ किसानों को सशक्त बनाना",
+                    hero_subheading: "एग्रीजीनियस टिकाऊ और लाभदायक कृषि के लिए फसल चयन, बाजार कीमतों, जोखिम अलर्ट और सरकारी योजनाओं पर एआई-पावर्ड जानकारी प्रदान करता है।",
+                    chat_btn: "एग्रीजीनियस एआई के साथ चैट करें",
+                    features_heading: "विशेषताएँ",
+                    feature1_title: "स्मार्ट फसल चयन",
+                    feature1_desc: "अपनी मिट्टी, जलवायु और बाजार के रुझानों के आधार पर सबसे अच्छी फसलों को लगाने के लिए डेटा-संचालित सिफारिशें प्राप्त करें।",
+                    feature2_title: "रीयल-टाइम बाजार मूल्य",
+                    feature2_desc: "अपने मुनाफे को अधिकतम करने और समय पर बिक्री के फैसले लेने के लिए वर्तमान बाजार कीमतों के बारे में सूचित रहें।",
+                    feature3_title: "सक्रिय जोखिम अलर्ट",
+                    feature3_desc: "कीटों के प्रकोप, बीमारियों और अत्यधिक मौसम की स्थिति जैसे संभावित जोखिमों के लिए तत्काल सूचनाएं प्राप्त करें।",
+                    feature4_title: "सरकारी योजनाएं",
+                    feature4_desc: "किसानों के लिए सरकारी योजनाओं और सब्सिडी के एक व्यापक और अद्यतित डेटाबेस तक पहुंचें।",
+                    feature5_title: "टिकाऊ पुरस्कार",
+                    feature5_desc: "टिकाऊ और लाभदायक कृषि का अभ्यास करने के लिए पुरस्कार अर्जित करें, एक स्वस्थ वातावरण को बढ़ावा दें।",
+                    feature6_title: "एआई-पावर्ड चैटबॉट",
+                    feature6_desc: "अपने खेती के सवालों के त्वरित जवाब पाने के लिए टेक्स्ट, आवाज या छवियों का उपयोग करके हमारे एआई सहायक के साथ बातचीत करें।",
+                    chat_heading: "एग्रीजीनियस एआई के साथ चैट करें ✨",
+                    chat_initial: "नमस्ते! मैं एग्रीजीनियस एआई हूँ। मैं आज आपकी खेती की जरूरतों में कैसे मदद कर सकता हूँ? आप अपना सवाल टाइप कर सकते हैं, या आवाज या छवि के साथ मुझसे पूछने के लिए माइक्रोफोन और कैमरा आइकन का उपयोग कर सकते हैं।",
+                    chat_input_placeholder: "अपना संदेश यहाँ टाइप करें...",
+                    loading_text: "एग्रीजीनियस सोच रहा है... ✨",
+                    about_heading: "एग्रीजीनियस के बारे में",
+                    about_text: "एग्रीजीनियस प्रौद्योगिकी के माध्यम से कृषि को बदलने के लिए प्रतिबद्ध एक क्रांतिकारी मंच है। हमारा मिशन दुनिया भर के किसानों को सटीक, सुलभ और कार्रवाई योग्य जानकारी के साथ सशक्त बनाना है, जो टिकाऊ और लाभदायक खेती प्रथाओं को बढ़ावा देता है। एआई की शक्ति का लाभ उठाकर, हम सूचना अंतराल को पाटना और हर किसान को अनुमानित समृद्धि प्राप्त करने में मदद करना चाहते हैं।",
+                    contact_link: "हमसे संपर्क करें",
+                    mission_link: "हमारा मिशन पढ़ें",
+                    footer_text: "© 2024 एग्रीजीनियस। सभी अधिकार सुरक्षित।",
+                    privacy_link: "गोपनीयता नीति",
+                    terms_link: "सेवा की शर्तें"
+                },
+                te: {
+                    title: "అగ్రీజీనియస్: రైతులకు ఏఐ-శక్తితో కూడిన వేదిక",
+                    hero_heading: "ఏఐతో రైతులకు సాధికారత కల్పించడం",
+                    hero_subheading: "అగ్రీజీనియస్ పంటల ఎంపిక, మార్కెట్ ధరలు, ప్రమాద హెచ్చరికలు మరియు ప్రభుత్వ పథకాలపై ఏఐ-శక్తితో కూడిన అంతర్దృష్టిని అందిస్తుంది, తద్వారా స్థిరమైన మరియు లాభదాయకమైన వ్యవసాయ భవిష్యత్తును నిర్ధారిస్తుంది.",
+                    chat_btn: "అగ్రీజీనియస్ ఏఐతో చాట్ చేయండి",
+                    features_heading: "ఫీచర్లు",
+                    feature1_title: "స్మార్ట్ పంటల ఎంపిక",
+                    feature1_desc: "మీ నేల, వాతావరణం మరియు మార్కెట్ పోకడల ఆధారంగా నాటడానికి ఉత్తమమైన పంటలపై డేటా-ఆధారిత సిఫార్సులను పొందండి.",
+                    feature2_title: "రియల్-టైమ్ మార్కెట్ ధరలు",
+                    feature2_desc: "మీ లాభాలను పెంచుకోవడానికి మరియు సమయానుగుణంగా అమ్మకపు నిర్ణయాలు తీసుకోవడానికి ప్రస్తుత మార్కెట్ ధరల గురించి సమాచారం పొందండి.",
+                    feature3_title: "చురుకైన ప్రమాద హెచ్చరికలు",
+                    feature3_desc: "తెగుళ్ల వ్యాప్తి, వ్యాధులు మరియు తీవ్రమైన వాతావరణ పరిస్థితుల వంటి సంభావ్య ప్రమాదాల కోసం తక్షణ నోటిఫికేషన్‌లను స్వీకరించండి.",
+                    feature4_title: "ప్రభుత్వ పథకాలు",
+                    feature4_desc: "రైతుల కోసం ప్రభుత్వ పథకాలు మరియు సబ్సిడీల సమగ్ర మరియు నవీకరించబడిన డేటాబేస్ను యాక్సెస్ చేయండి.",
+                    feature5_title: "స్థిరమైన బహుమతులు",
+                    feature5_desc: "స్థిరమైన మరియు లాభదాయకమైన వ్యవసాయాన్ని ఆచరించడానికి బహుమతులు సంపాదించండి, ఆరోగ్యకరమైన వాతావరణాన్ని ప్రోత్సహించండి.",
+                    feature6_title: "ఏఐ-శక్తితో కూడిన చాట్‌బాట్",
+                    feature6_desc: "మీ వ్యవసాయ ప్రశ్నలకు తక్షణ సమాధానాలను పొందడానికి టెక్స్ట్, వాయిస్ లేదా చిత్రాలను ఉపయోగించి మా ఏఐ అసిస్టెంట్‌తో సంభాషించండి。",
+                    chat_heading: "అగ్రీజీనియస్ ఏఐతో చాట్ చేయండి ✨",
+                    chat_initial: "నమస్తే! నేను అగ్రీజీనియస్ ఏఐని. నేను ఈ రోజు మీ వ్యవసాయ అవసరాలలో ఎలా సహాయపడగలను? మీరు మీ ప్రశ్నను టైప్ చేయవచ్చు లేదా వాయిస్ లేదా చిత్రంతో నన్ను అడగడానికి మైక్రోఫోన్ మరియు కెమెరా చిహ్నాలను ఉపయోగించవచ్చు.",
+                    chat_input_placeholder: "మీ సందేశాన్ని ఇక్కడ టైప్ చేయండి...",
+                    loading_text: "అగ్రీజీనియస్ ఆలోచిస్తోంది... ✨",
+                    about_heading: "అగ్రీజీనియస్ గురించి",
+                    about_text: "అగ్రీజీనియస్ అనేది సాంకేతికత ద్వారా వ్యవసాయాన్ని మార్చడానికి కట్టుబడి ఉన్న ఒక విప్లవాత్మక వేదిక. మా లక్ష్యం ప్రపంచవ్యాప్తంగా ఉన్న రైతులకు ఖచ్చితమైన, అందుబాటులో ఉన్న మరియు ఆచరణాత్మక అంతర్దృష్టిని అందించి, స్థిరమైన మరియు లాభదాయకమైన వ్యవసాయ పద్ధతులను ప్రోత్సహించడం. ఏఐ శక్తిని ఉపయోగించుకొని, మేము సమాచార అంతరాన్ని పూరించడానికి మరియు ప్రతి రైతుకు ఊహించదగిన శ్రేయస్సును సాధించడానికి సహాయం చేయడానికి లక్ష్యంగా పెట్టుకున్నాము。",
+                    contact_link: "మమ్మల్ని సంప్రదించండి",
+                    mission_link: "మా లక్ష్యాన్ని చదవండి",
+                    footer_text: "© 2024 అగ్రీజీనియస్. అన్ని హక్కులు రిజర్వ్ చేయబడ్డాయి.",
+                    privacy_link: "గోప్యతా విధానం",
+                    terms_link: "సేవా నిబంధనలు"
+                },
+                mr: {
+                    title: "अ‍ॅग्रीजीनियस: शेतकऱ्यांसाठी एआय-शक्तीकृत प्लॅटफॉर्म",
+                    hero_heading: "एआयसह शेतकऱ्यांना सक्षम करणे",
+                    hero_subheading: "अ‍ॅग्रीजीनियस टिकाऊ आणि फायदेशीर शेतीसाठी पिकांची निवड, बाजारभाव, जोखीम सूचना आणि सरकारी योजनांवर एआय-शक्तीकृत अंतर्दृष्टी प्रदान करते。",
+                    chat_btn: "अ‍ॅग्रीजीनियस एआयसह चॅट करा",
+                    features_heading: "वैशिष्ट्ये",
+                    feature1_title: "स्मार्ट पीक निवड",
+                    feature1_desc: "तुमच्या माती, हवामान आणि बाजारातील ट्रेंडवर आधारित सर्वोत्तम पिके लावण्याबद्दल डेटा-आधारित शिफारसी मिळवा。",
+                    feature2_title: "वास्तविक-वेळ बाजारभाव",
+                    feature2_desc: "तुमचा नफा वाढवण्यासाठी आणि वेळेवर विक्रीचे निर्णय घेण्यासाठी वर्तमान बाजारभावांबद्दल माहिती ठेवा。",
+                    feature3_title: "सक्रिय जोखीम सूचना",
+                    feature3_desc: "कीटकांच्या प्रादुर्भावा, रोगा आणि अत्यंत हवामानासारख्या संभाव्य जोखमींसाठी त्वरित सूचना प्राप्त करा。",
+                    feature4_title: "सरकारी योजना",
+                    feature4_desc: "शेतकऱ्यांसाठी सरकारी योजना आणि अनुदानांच्या विस्तृत आणि अद्ययावत डेटाबेसमध्ये प्रवेश मिळवा。",
+                    feature5_title: "टिकाऊ बक्षिसे",
+                    feature5_desc: "टिकाऊ आणि फायदेशीर शेतीचा सराव करण्यासाठी बक्षिसे मिळवा, ज्यामुळे एक निरोगी पर्यावरणाला प्रोत्साहन मिळते。",
+                    feature6_title: "एआय-शक्तीकृत चॅटबॉट",
+                    feature6_desc: "तुमच्या शेतीविषयक प्रश्नांची त्वरित उत्तरे मिळवण्यासाठी टेक्स्ट, व्हॉइस किंवा प्रतिमा वापरून आमच्या एआय सहाय्यकासह संवाद साधा。",
+                    chat_heading: "एग्रीजीनियस एआयसह चॅट करा ✨",
+                    chat_initial: "नमस्कार! मी अ‍ॅग्रीजीनियस एआय आहे. मी आज तुमच्या शेतीच्या गरजांमध्ये कशी मदत करू शकतो? तुम्ही तुमचा प्रश्न टाइप करू शकता, किंवा व्हॉइस किंवा प्रतिमेसह मला विचारण्यासाठी मायक्रोफोन आणि कॅमेरा आयकॉन वापरू शकता。",
+                    chat_input_placeholder: "येथे तुमचा संदेश टाइप करा...",
+                    loading_text: "अ‍ॅग्रीजीनियस विचार करत आहे... ✨",
+                    about_heading: "अ‍ॅग्रीजीनियस बद्दल",
+                    about_text: "अ‍ॅग्रीजीनियस हे तंत्रज्ञानाद्वारे शेतीमध्ये क्रांती घडवण्यासाठी वचनबद्ध एक क्रांतिकारी प्लॅटफॉर्म आहे. आमचे ध्येय जगभरातील शेतकऱ्यांना अचूक, सुलभ आणि कृतीशील अंतर्दृष्टीने सक्षम करणे आहे, ज्यामुळे टिकाऊ आणि फायदेशीर शेती पद्धतींना प्रोत्साहन मिळते. एआयच्या शक्तीचा लाभ घेऊन, आम्ही माहितीतील दरी कमी करण्याचा आणि प्रत्येक शेतकऱ्याला अपेक्षित समृद्धी मिळवून देण्याचा प्रयत्न करतो。",
+                    contact_link: "आमच्याशी संपर्क साधा",
+                    mission_link: "आमचे ध्येय वाचा",
+                    footer_text: "© 2024 अ‍ॅग्रीजीनियस. सर्व हक्क राखीव。",
+                    privacy_link: "गोपनीयता धोरण",
+                    terms_link: "सेवा अटी"
+                },
+                kn: {
+                    title: "ಅಗ್ರಿಜೀನಿಯಸ್: ರೈತರಿಗಾಗಿ AI-ಚಾಲಿತ ವೇದಿಕೆ",
+                    hero_heading: "AI ಮೂಲಕ ರೈತರನ್ನು ಸಬಲೀಕರಣಗೊಳಿಸುವುದು",
+                    hero_subheading: "ಅಗ್ರಿಜೀನಿಯಸ್ ಬೆಳೆ ಆಯ್ಕೆ, ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳು, ಅಪಾಯದ ಎಚ್ಚರಿಕೆಗಳು ಮತ್ತು ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಕುರಿತು AI-ಚಾಲಿತ ಒಳನೋಟಗಳನ್ನು ಒದಗಿಸುತ್ತದೆ, ಇದರಿಂದ ಸುಸ್ಥಿರ ಮತ್ತು ಲಾಭದಾಯಕ ಕೃಷಿಯ ಭವಿಷ್ಯವನ್ನು ಖಚಿತಪಡಿಸುತ್ತದೆ。",
+                    chat_btn: "ಅಗ್ರಿಜೀನಿಯಸ್ AI ಜೊತೆ ಚಾಟ್ ಮಾಡಿ",
+                    features_heading: "ವೈಶಿಷ್ಟ್ಯಗಳು",
+                    feature1_title: "ಸ್ಮಾರ್ಟ್ ಬೆಳೆ ಆಯ್ಕೆ",
+                    feature1_desc: "ನಿಮ್ಮ ಮಣ್ಣು, ಹವಾಮಾನ ಮತ್ತು ಮಾರುಕಟ್ಟೆ ಪ್ರವೃತ್ತಿಗಳ ಆಧಾರದ ಮೇಲೆ ಉತ್ತಮ ಬೆಳೆಗಳನ್ನು ಬೆಳೆಯಲು ಡೇಟಾ-ಚಾಲಿತ ಶಿಫಾರಸುಗಳನ್ನು ಪಡೆಯಿರಿ。",
+                    feature2_title: "ರಿಯಲ್-ಟೈಮ್ ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳು",
+                    feature2_desc: "ನಿಮ್ಮ ಲಾಭವನ್ನು ಗರಿಷ್ಠಗೊಳಿಸಲು ಮತ್ತು ಸಮಯಕ್ಕೆ ಸರಿಯಾದ ಮಾರಾಟ ನಿರ್ಧಾರಗಳನ್ನು ತೆಗೆದುಕೊಳ್ಳಲು ಪ್ರಸ್ತುತ ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳ ಬಗ್ಗೆ ಮಾಹಿತಿ ಪಡೆಯಿರಿ。",
+                    feature3_title: "ಸಕ್ರಿಯ ಅಪಾಯದ ಎಚ್ಚರಿಕೆಗಳು",
+                    feature3_desc: "ಕೀಟಗಳ ಹಾವಳಿ, ರೋಗಗಳು ಮತ್ತು ವಿಪರೀತ ಹವಾಮಾನ ಪರಿಸ್ಥಿತಿಗಳಂತಹ ಸಂಭಾವ್ಯ ಅಪಾಯಗಳಿಗೆ ತಕ್ಷಣದ ಸೂಚನೆಗಳನ್ನು ಸ್ವೀಕರಿಸಿ。",
+                    feature4_title: "ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು",
+                    feature4_desc: "ರೈತರಿಗಾಗಿ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳು ಮತ್ತು ಸಬ್ಸಿಡಿಗಳ ಸಮಗ್ರ ಮತ್ತು ನವೀಕೃತ ಡೇಟಾಬೇಸ್ ಅನ್ನು ಪ್ರವೇಶಿಸಿ。",
+                    feature5_title: "ಸುಸ್ಥಿರ ಪ್ರತಿಫಲಗಳು",
+                    feature5_desc: "ಸುಸ್ಥಿರ ಮತ್ತು ಲಾಭದಾಯಕ ಕೃಷಿಯನ್ನು ಅಭ್ಯಾಸ ಮಾಡುವುದಕ್ಕಾಗಿ ಪ್ರತಿಫಲಗಳನ್ನು ಗಳಿಸಿ, ಇದರಿಂದ ಆರೋಗ್ಯಕರ ಪರಿಸರವನ್ನು ಉತ್ತೇಜಿಸಿ。",
+                    feature6_title: "AI-ಚಾಲಿತ ಚಾಟ್‌ಬಾಟ್",
+                    feature6_desc: "ನಿಮ್ಮ ಕೃಷಿ ಪ್ರಶ್ನೆಗಳಿಗೆ ತಕ್ಷಣದ ಉತ್ತರಗಳನ್ನು ಪಡೆಯಲು ಪಠ್ಯ, ಧ್ವನಿ ಅಥವಾ ಚಿತ್ರಗಳನ್ನು ಬಳಸಿ ನಮ್ಮ AI ಸಹಾಯಕದೊಂದಿಗೆ ಸಂವಹಿಸಿ。",
+                    chat_heading: "ಅಗ್ರಿಜೀನಿಯಸ್ AI ಜೊತೆ ಚಾಟ್ ಮಾಡಿ ✨",
+                    chat_initial: "ನಮಸ್ಕಾರ! ನಾನು ಅಗ್ರಿಜೀನಿಯಸ್ AI. ಇಂದು ನಿಮ್ಮ ಕೃಷಿ ಅಗತ್ಯಗಳಲ್ಲಿ ನಾನು ಹೇಗೆ ಸಹಾಯ ಮಾಡಬಹುದು? ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ನೀವು ಟೈಪ್ ಮಾಡಬಹುದು, ಅಥವಾ ಧ್ವನಿ ಅಥವಾ ಚಿತ್ರದೊಂದಿಗೆ ನನ್ನನ್ನು ಕೇಳಲು ಮೈಕ್ರೋಫೋನ್ ಮತ್ತು ಕ್ಯಾಮರಾ ಐಕಾನ್‌ಗಳನ್ನು ಬಳಸಬಹುದು。",
+                    chat_input_placeholder: "ನಿಮ್ಮ ಸಂದೇಶವನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ...",
+                    loading_text: "ಅಗ್ರಿಜೀನಿಯಸ್ ಯೋಚಿಸುತ್ತಿದೆ... ✨",
+                    about_heading: "ಅಗ್ರಿಜೀನಿಯಸ್ ಬಗ್ಗೆ",
+                    about_text: "ಅಗ್ರಿಜೀನಿಯಸ್ ತಂತ್ರಜ್ಞಾನದ ಮೂಲಕ ಕೃಷಿಯನ್ನು ಪರಿವರ್ತಿಸಲು ಬದ್ಧವಾಗಿರುವ ಒಂದು ಕ್ರಾಂತಿಕಾರಿ ವೇದಿಕೆ. ನಮ್ಮ ಉದ್ದೇಶವು ವಿಶ್ವಾದ್ಯಂತದ ರೈತರಿಗೆ ನಿಖರ, ಸುಲಭವಾಗಿ ಪ್ರವೇಶಿಸಬಹುದಾದ ಮತ್ತು ಕ್ರಿಯಾತ್ಮಕ ಒಳನೋಟಗಳನ್ನು ನೀಡಿ, ಸುಸ್ಥಿರ ಮತ್ತು ಲಾಭದಾಯಕ ಕೃಷಿ ಪದ್ಧತಿಗಳನ್ನು ಉತ್ತೇಜಿಸುವುದು. AI ಶಕ್ತಿಯನ್ನು ಬಳಸಿಕೊಂಡು, ನಾವು ಮಾಹಿತಿಯ ಅಂತರವನ್ನು ತುಂಬಲು ಮತ್ತು ಪ್ರತಿ ರೈತರಿಗೆ ನಿರೀಕ್ಷಿತ ಸಮೃದ್ಧಿಯನ್ನು ಸಾಧಿಸಲು ಗುರಿ ಹೊಂದಿದ್ದೇವೆ。",
+                    contact_link: "ನಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಿ",
+                    mission_link: "ನಮ್ಮ ಮಿಷನ್ ಓದಿ",
+                    footer_text: "© 2024 ಅಗ್ರಿಜೀನಿಯಸ್. ಎಲ್ಲಾ ಹಕ್ಕುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ。",
+                    privacy_link: "ಗೌಪ್ಯತಾ ನೀತಿ",
+                    terms_link: "ಸೇವಾ ನಿಯಮಗಳು"
+                },
+                gu: {
+                    title: "એગ્રીજીનિયસ: ખેડૂતો માટે એઆઈ-સંચાલિત પ્લેટફોર્મ",
+                    hero_heading: "એઆઈ સાથે ખેડૂતોને સશક્ત બનાવો",
+                    hero_subheading: "એગ્રીજીનિયસ ટકાઉ અને નફાકારક કૃષિ માટે પાક પસંદગી, બજાર કિંમતો, જોખમ ચેતવણીઓ અને સરકારી યોજનાઓ પર એઆઈ-સંચાલિત આંતરદૃષ્ટિ પ્રદાન કરે છે。",
+                    chat_btn: "એગ્રીજીનિયસ એઆઈ સાથે ચેટ કરો",
+                    features_heading: "વિશેષતાઓ",
+                    feature1_title: "સ્માર્ટ પાક પસંદગી",
+                    feature1_desc: "તમારી જમીન, આબોહવા અને બજારના વલણોના આધારે વાવવા માટે શ્રેષ્ઠ પાકો પર ડેટા-આધારિત ભલામણો મેળવો。",
+                    feature2_title: "વાસ્તવિક-સમય બજાર કિંમતો",
+                    feature2_desc: "તમારા નફાને મહત્તમ કરવા અને સમયસર વેચાણના નિર્ણયો લેવા માટે વર્તમાન બજાર કિંમતો વિશે માહિતગાર રહો。",
+                    feature3_title: "સક્રિય જોખમ ચેતવણીઓ",
+                    feature3_desc: "જીવાતોના ઉપદ્રવ, રોગો અને આત્યંતિક હવામાન પરિસ્થિતિઓ જેવા સંભવિત જોખમો માટે ત્વરિત સૂચનાઓ પ્રાપ્ત કરો。",
+                    feature4_title: "સરકારી યોજનાઓ",
+                    feature4_desc: "ખેડૂતો માટે સરકારી યોજનાઓ અને સબસિડીના વ્યાપક અને અદ્યતન ડેટાબેઝને ઍક્સેસ કરો。",
+                    feature5_title: "ટકાઉ પુરસ્કારો",
+                    feature5_desc: "ટકાઉ અને નફાકારક કૃષિનો અભ્યાસ કરવા માટે પુરસ્કારો કમાઓ, જે એક સ્વસ્થ પર્યાવરણને પ્રોત્સાહન આપે છે。",
+                    feature6_title: "એઆઈ-સંચાલિત ચેટબોટ",
+                    feature6_desc: "તમારા ખેતીના પ્રશ્નોના ત્વરિત જવાબો મેળવવા માટે ટેક્સ્ટ, વૉઇસ અથવા છબીઓનો ઉપયોગ કરીને અમારા એઆઈ સહાયક સાથે વાર્તાલાપ કરો。",
+                    chat_heading: "એગ્રીજીનિયસ એઆઈ સાથે ચેટ કરો ✨",
+                    chat_initial: "નમસ્તે! હું એગ્રીજીનિયસ એઆઈ છું. આજે હું તમારી ખેતીની જરૂરિયાતોમાં કેવી રીતે મદદ કરી શકું? તમે તમારો પ્રશ્ન ટાઈપ કરી શકો છો, અથવા વૉઇસ અથવા છબી સાથે મને પૂછવા માટે માઇક્રોફોન અને કૅમેરા આઇકોનનો ઉપયોગ કરી શકો છો。",
+                    chat_input_placeholder: "તમારો સંદેશ અહીં ટાઈપ કરો...",
+                    loading_text: "એગ્રીજીનિયસ વિચારી રહ્યું છે... ✨",
+                    about_heading: "એગ્રીજીનિયસ વિશે",
+                    about_text: "એગ્રીજીનિયસ એ ટેકનોલોજી દ્વારા કૃષિમાં ક્રાંતિ લાવવા માટે પ્રતિબદ્ધ એક ક્રાંતિકારી પ્લેટફોર્મ છે. અમારું મિશન વિશ્વભરના ખેડૂતોને સચોટ, સુલભ અને ક્રિયાશીલ આંતરદૃષ્ટિ સાથે સશક્ત બનાવવાનું છે, જે ટકાઉ અને નફાકારક ખેતી પદ્ધતિઓને પ્રોત્સાહન આપે છે. એઆઈની શક્તિનો લાભ લઈને, અમે માહિતીના અંતરને દૂર કરવા અને દરેક ખેડૂતને અનુમાનિત સમૃદ્ધિ પ્રાપ્ત કરવામાં મદદ કરવાનો લક્ષ્યાંક રાખીએ છીએ。",
+                    contact_link: "અમારો સંપર્ક કરો",
+                    mission_link: "અમારું મિશન વાંચો",
+                    footer_text: "© 2024 એગ્રીજીનિયસ. બધા હક અનામત છે。",
+                    privacy_link: "ગોપનીયતા નીતિ",
+                    terms_link: "સેવાની શરતો"
+                }
+            };
+
+            const langLinks = document.querySelectorAll('#language-menu a');
+            langLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const lang = e.target.dataset.lang;
+                    updateLanguage(lang);
+                    languageMenu.classList.add('hidden');
+                });
+            });
+
+            function updateLanguage(lang) {
+                const translation = texts[lang];
+                if (!translation) return;
+
+                document.title = translation.title;
+                document.querySelector('h1').textContent = "AgriGenius";
+                document.querySelector('#hero h2').textContent = translation.hero_heading;
+                document.querySelector('#hero p').textContent = translation.hero_subheading;
+                document.querySelector('#hero a').textContent = translation.chat_btn;
+                document.querySelector('#features h3').textContent = translation.features_heading;
+                document.querySelectorAll('#features .p-8')[0].querySelector('h4').textContent = translation.feature1_title;
+                document.querySelectorAll('#features .p-8')[0].querySelector('p').textContent = translation.feature1_desc;
+                document.querySelectorAll('#features .p-8')[1].querySelector('h4').textContent = translation.feature2_title;
+                document.querySelectorAll('#features .p-8')[1].querySelector('p').textContent = translation.feature2_desc;
+                document.querySelectorAll('#features .p-8')[2].querySelector('h4').textContent = translation.feature3_title;
+                document.querySelectorAll('#features .p-8')[2].querySelector('p').textContent = translation.feature3_desc;
+                document.querySelectorAll('#features .p-8')[3].querySelector('h4').textContent = translation.feature4_title;
+                document.querySelectorAll('#features .p-8')[3].querySelector('p').textContent = translation.feature4_desc;
+                document.querySelectorAll('#features .p-8')[4].querySelector('h4').textContent = translation.feature5_title;
+                document.querySelectorAll('#features .p-8')[4].querySelector('p').textContent = translation.feature5_desc;
+                document.querySelectorAll('#features .p-8')[5].querySelector('h4').textContent = translation.feature6_title;
+                document.querySelectorAll('#features .p-8')[5].querySelector('p').textContent = translation.feature6_desc;
+                document.querySelector('#ai-section h3').textContent = translation.chat_heading;
+                document.querySelector('.ai-message.chat-message').textContent = translation.chat_initial;
+                document.getElementById('chat-input').placeholder = translation.chat_input_placeholder;
+                document.querySelector('#loading-indicator p').textContent = translation.loading_text;
+                document.querySelector('#about h3').textContent = translation.about_heading;
+                document.querySelector('#about p').textContent = translation.about_text;
+                document.querySelector('#about a:first-child').textContent = translation.contact_link;
+                document.querySelector('#about a:last-child').textContent = translation.mission_link;
+                document.querySelector('footer p').textContent = translation.footer_text;
+                document.querySelectorAll('footer a')[0].textContent = translation.privacy_link;
+                document.querySelectorAll('footer a')[1].textContent = translation.terms_link;
+            }
+
+            // Chatbot functionality
+            const chatInput = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('send-btn');
+            const imageBtn = document.getElementById('image-btn');
+            const imageUpload = document.getElementById('image-upload');
+            const voiceBtn = document.getElementById('voice-btn');
+            const chatContainer = document.getElementById('chat-container');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const audioPlayer = document.getElementById('audio-player');
+
+            async function sendMessage(text, imageBase64 = null) {
+                if (!text && !imageBase64) return;
+
+                appendMessage(text, true);
+                loadingIndicator.classList.remove('hidden');
+
+                const requestPayload = {
+                    contents: [{
+                        role: "user",
+                        parts: []
+                    }]
+                };
+
+                if (text) {
+                    requestPayload.contents[0].parts.push({
+                        text: text
+                    });
+                }
+
+                if (imageBase64) {
+                    requestPayload.contents[0].parts.push({
+                        inlineData: {
+                            mimeType: "image/jpeg",
+                            data: imageBase64
+                        }
+                    });
+                }
+
+                try {
+                    const response = await fetch(GEMINI_TEXT_API + apiKey, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(requestPayload)
+                    });
+
+                    const result = await response.json();
+                    const aiResponseText = result.candidates[0].content.parts[0].text;
+                    appendMessage(aiResponseText, false);
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    appendMessage("Sorry, I'm unable to process your request at the moment. Please try again later.", false);
+                } finally {
+                    loadingIndicator.classList.add('hidden');
+                }
+            }
+
+            function appendMessage(text, isUser) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+                const messageContent = document.createElement('div');
+                messageContent.className = `chat-message ${isUser ? 'user-message' : 'ai-message'}`;
+                messageContent.textContent = text;
+                messageDiv.appendChild(messageContent);
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                if (!isUser) {
+                    const audioBtn = document.createElement('button');
+                    audioBtn.className = 'bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs hover:bg-gray-300 ml-2';
+                    audioBtn.textContent = '🔊';
+                    audioBtn.onclick = () => playAudio(text);
+                    messageContent.appendChild(audioBtn);
+                }
+            }
+
+            sendBtn.addEventListener('click', () => {
+                const text = chatInput.value.trim();
+                if (text) {
+                    sendMessage(text);
+                    chatInput.value = '';
+                }
+            });
+
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendBtn.click();
+                }
+            });
+
+            imageBtn.addEventListener('click', () => {
+                imageUpload.click();
+            });
+
+            imageUpload.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const base64 = reader.result.split(',')[1];
+                        sendMessage("Analyzing image...", base64);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Voice message placeholder functionality
+            voiceBtn.addEventListener('click', () => {
+                appendMessage("Voice message received! Sorry, voice-to-text is not yet implemented. Please type your message or try the new text-to-speech button on my responses.", true);
+            });
+
+            // 3D background animation
+            const canvasContainer = document.getElementById('canvas-container');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({
+                antialias: true,
+                alpha: true
+            });
+
+            renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
+            canvasContainer.appendChild(renderer.domElement);
+
+            const geometry = new THREE.TorusGeometry(10, 3, 16, 100);
+            const material = new THREE.MeshBasicMaterial({
+                color: 0x4ade80,
+                wireframe: true
+            });
+            const torus = new THREE.Mesh(geometry, material);
+            scene.add(torus);
+
+            camera.position.z = 30;
+
+            function animate() {
+                requestAnimationFrame(animate);
+
+                torus.rotation.x += 0.005;
+                torus.rotation.y += 0.005;
+
+                renderer.render(scene, camera);
+            }
+
+            function onWindowResize() {
+                camera.aspect = canvasContainer.clientWidth / canvasContainer.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
+            }
+
+            window.addEventListener('resize', onWindowResize, false);
+
+            window.onload = function() {
+                animate();
+            };
+        });
+    </script>
+
+</body>
+
+</html>
